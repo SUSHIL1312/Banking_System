@@ -586,21 +586,7 @@ int main(int argc,char *argv[]){
 
     listen(sockfd,5);
     clilen=sizeof(cli_addr);
-    
-    /*if(newsockfd<0)
-        error("Error on Accept");
-    while(1){
-
-        memset(&cli_addr, 0, sizeof(cli_addr));
-          newsockfd=accept(sockfd,(struct sockaddr *)&cli_addr,&clilen);
-          if(newsockfd<0){
-              error("Error in accepting.");
-          }
-           bankClientHandler(newsockfd);
-
-    }
-    close(newsockfd);
-	*/
+   
 	signal(SIGCHLD, SIG_IGN); // Avoid zombie processes
     while (true) {
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
