@@ -33,6 +33,7 @@ using namespace std;
 #include<sstream>
 #include <arpa/inet.h> 
 #include<unordered_set>
+#include <signal.h>
 
 #define USER 0
 #define POLICE 1
@@ -59,8 +60,8 @@ void closeclient(int clientFD,string str);
 void bankClientHandler(int clientFD);
 string getBalance(string username);
 
-unordered_set <string> allCustomers({"101","102","103","104","105","106",
-"107","108","109","110"});
+unordered_set <string> allCustomers;
+//unordered_set <string> allCustomers({"101","102","103","104","105","106","107","108","109","110"});
 
 void error(const char *msg){
     perror(msg);
@@ -553,13 +554,21 @@ void closeclient(int client_fd,string str)
 
 
 int main(int argc,char *argv[]){
+
+	string customerIDs[] = {"101", "102", "103", "104", "105", "106", "107", "108", "109", "110"};
+    
+    // Insert values into allCustomers using a for loop
+    for (int i = 0; i < 10; ++i) {
+        allCustomers.insert(customerIDs[i]);
+    }
+    
     if(argc <2){
         
         cout<<"Port number not provided...\n Program Terminated..."<<endl;
         exit(1);
     }
     cout<<"Ready to accept your query: "<<endl;
-    int sockfd,newsockfd,portno,n;
+    int sockfd,newsockfd,portno,n,pid;
     char buffer[255];
     struct sockaddr_in serv_addr,cli_addr;
     socklen_t clilen;//it is a datatype
@@ -578,7 +587,7 @@ int main(int argc,char *argv[]){
     listen(sockfd,5);
     clilen=sizeof(cli_addr);
     
-    if(newsockfd<0)
+    /*if(newsockfd<0)
         error("Error on Accept");
     while(1){
 
@@ -591,6 +600,23 @@ int main(int argc,char *argv[]){
 
     }
     close(newsockfd);
+	*/
+	signal(SIGCHLD, SIG_IGN); // Avoid zombie processes
+    while (true) {
+        newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+        if (newsockfd < 0) 
+            error("ERROR on accept");
+        
+        pid = fork();
+        if (pid < 0)
+            error("ERROR on fork");
+        if (pid == 0) {
+            close(sockfd);
+            bankClientHandler(newsockfd);
+            exit(0);
+        }
+        else close(newsockfd);
+    }
     close(sockfd);
 
     return 0;

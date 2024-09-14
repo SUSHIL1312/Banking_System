@@ -10,7 +10,7 @@
 */
 /*
         Execution: compile and run in Terminal.(firstly start the server program then client program)
-        for client :  g++ bank_client.cpp -o bank_server
+        for client :  g++ bank_client.cpp -o bank_client  
                       ./bank_client <localhost/ip_address> <port_no same as server>
 
 */
